@@ -1,0 +1,40 @@
+# Virtual Environment
+venv/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment Variables
+.env
+
+# Uploaded Files
+uploads/
+
+# Machine Learning Models (Optional)
+# Agar models GitHub par upload nahi karne hain to uncomment kar dena
+# models/
+
+# Jupyter Notebooks Checkpoints
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Temporary Files
+*.tmp
+*.temp
+
+# Pytest Cache
+.pytest_cache/
+
+# Coverage Reports
+.coverage
+htmlcov/
