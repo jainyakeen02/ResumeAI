@@ -39,7 +39,7 @@ def login():
         
     token = jwt.encode({
         'user_id': user.id,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
     }, current_app.config['SECRET_KEY'], algorithm="HS256")
     
     return jsonify({'message': 'Login successful', 'token': token, 'user': user.to_dict()}), 200

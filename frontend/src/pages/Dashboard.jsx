@@ -42,16 +42,16 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
             Welcome back, {displayName} 👋
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-1">
             Here's what's happening with your resume analysis today.
           </p>
         </div>
         <Link
           to="/upload"
-          className="bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl font-medium shadow-lg shadow-brand-500/30 transition-all hover:-translate-y-0.5 whitespace-nowrap flex items-center gap-2"
+          className="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl font-medium shadow-lg shadow-brand-500/30 transition-all hover:-translate-y-0.5 whitespace-nowrap flex items-center justify-center gap-2"
         >
           Upload New Resume
           <ArrowRight size={16} />
@@ -59,21 +59,21 @@ export default function Dashboard() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.title} className="glass rounded-2xl p-6 transition-transform hover:scale-[1.02]">
+            <div key={stat.title} className="glass rounded-2xl p-5 sm:p-6 transition-transform hover:scale-[1.02]">
               <div className="flex items-center gap-4">
-                <div className={`p-4 rounded-xl ${stat.bg} ${stat.color}`}>
+                <div className={`p-3.5 sm:p-4 rounded-xl ${stat.bg} ${stat.color}`}>
                   <Icon size={24} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{stat.title}</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">{stat.title}</p>
                   {loading ? (
                     <div className="h-8 w-12 mt-1 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
                   ) : (
-                    <p className="text-3xl font-bold text-slate-900 dark:text-white">{stat.value}</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{stat.value}</p>
                   )}
                 </div>
               </div>
@@ -83,8 +83,8 @@ export default function Dashboard() {
       </div>
 
       {/* Activity Chart */}
-      <div className="glass rounded-2xl p-6">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">Upload Activity (Last 6 Months)</h3>
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white mb-4 sm:mb-6">Upload Activity (Last 6 Months)</h3>
         {loading ? (
           <div className="h-64 flex items-center justify-center">
             <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />

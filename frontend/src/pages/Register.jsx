@@ -17,7 +17,11 @@ export default function Register() {
       await api.post('/auth/register', formData);
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      if (!err.response) {
+        setError('Cannot connect to backend server. Please ensure Python backend is running on port 5000.');
+      } else {
+        setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -51,7 +55,7 @@ export default function Register() {
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl p-8"
+        <div className="rounded-2xl p-6 sm:p-8"
           style={{
             background: 'rgba(255,255,255,0.9)',
             border: '1px solid #bae6fd',

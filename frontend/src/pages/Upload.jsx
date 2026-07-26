@@ -80,16 +80,16 @@ export default function Upload() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Upload Resume</h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Upload your PDF resume for AI-powered analysis.</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Upload Resume</h2>
+        <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-1">Upload your PDF resume for AI-powered analysis.</p>
       </div>
 
-      <div className="glass rounded-2xl p-8">
+      <div className="glass rounded-2xl p-5 sm:p-8">
         {!file ? (
           <div 
-            className={`relative border-2 border-dashed rounded-2xl p-12 transition-all duration-200 ease-in-out flex flex-col items-center justify-center text-center cursor-pointer
+            className={`relative border-2 border-dashed rounded-2xl p-6 sm:p-12 transition-all duration-200 ease-in-out flex flex-col items-center justify-center text-center cursor-pointer
               ${dragActive ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20 scale-[1.02]' : 'border-slate-300 dark:border-slate-700 hover:border-brand-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'}
             `}
             onDragEnter={handleDrag}
@@ -103,33 +103,33 @@ export default function Upload() {
               onChange={handleChange} 
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
-            <div className="bg-white dark:bg-slate-800 p-4 rounded-full shadow-sm mb-4">
-              <UploadCloud size={32} className="text-brand-500" />
+            <div className="bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-full shadow-sm mb-3 sm:mb-4">
+              <UploadCloud size={28} className="text-brand-500 sm:w-8 sm:h-8" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white mb-2">
               Drag & Drop your resume here
             </h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-6">
               or click to browse from your computer (PDF only, max 10MB)
             </p>
-            <button className="bg-slate-900 dark:bg-brand-600 text-white px-6 py-2.5 rounded-xl font-medium transition-transform hover:scale-105 pointer-events-none">
+            <button className="bg-slate-900 dark:bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-transform hover:scale-105 pointer-events-none">
               Select File
             </button>
           </div>
         ) : (
           <div className="space-y-6">
             <div className="flex items-center justify-between p-4 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/50">
-              <div className="flex items-center gap-4">
-                <div className="bg-brand-100 dark:bg-brand-900/30 p-3 rounded-lg text-brand-600 dark:text-brand-400">
-                  <FileIcon size={24} />
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div className="bg-brand-100 dark:bg-brand-900/30 p-2.5 sm:p-3 rounded-lg text-brand-600 dark:text-brand-400 shrink-0">
+                  <FileIcon size={22} />
                 </div>
-                <div>
-                  <p className="font-semibold text-slate-900 dark:text-white truncate max-w-xs">{file.name}</p>
+                <div className="min-w-0">
+                  <p className="font-semibold text-slate-900 dark:text-white truncate max-w-[180px] sm:max-w-xs text-sm sm:text-base">{file.name}</p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
                 </div>
               </div>
               {uploadStatus === 'idle' && (
-                <button onClick={resetUpload} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
+                <button onClick={resetUpload} className="p-2 text-slate-400 hover:text-red-500 transition-colors shrink-0">
                   <X size={20} />
                 </button>
               )}
@@ -145,15 +145,15 @@ export default function Upload() {
             {uploadStatus === 'success' && (
               <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 p-4 rounded-xl text-sm border border-emerald-200 dark:border-emerald-500/20">
                 <CheckCircle size={16} />
-                Resume uploaded successfully! Extracting text and queuing for ML Analysis...
+                Resume uploaded successfully! Text extracted & analyzed.
               </div>
             )}
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button 
                 onClick={resetUpload}
                 disabled={uploadStatus === 'uploading'}
-                className="flex-1 py-3 px-4 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+                className="flex-1 py-3 px-4 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 text-sm"
               >
                 {uploadStatus === 'success' ? 'Upload Another' : 'Cancel'}
               </button>
@@ -162,7 +162,7 @@ export default function Upload() {
                 <button 
                   onClick={handleUpload}
                   disabled={uploadStatus === 'uploading'}
-                  className="flex-1 py-3 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-medium shadow-lg shadow-brand-500/30 transition-all disabled:opacity-70 flex justify-center items-center gap-2"
+                  className="flex-1 py-3 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-medium shadow-lg shadow-brand-500/30 transition-all disabled:opacity-70 flex justify-center items-center gap-2 text-sm"
                 >
                   {uploadStatus === 'uploading' ? (
                     <>

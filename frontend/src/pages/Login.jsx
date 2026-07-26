@@ -1,17 +1,27 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, AlertCircle, Zap } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { Mail, Lock, AlertCircle, Zap, Info } from 'lucide-react';
 import api from '../utils/api';
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
+  const [sessionExpiredMsg, setSessionExpiredMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('expired') === 'true') {
+      setSessionExpiredMsg('Your session has expired or token is invalid. Please sign in again.');
+    }
+  }, [location]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSessionExpiredMsg('');
     setLoading(true);
     try {
       const response = await api.post('/auth/login', formData);
@@ -19,7 +29,11 @@ export default function Login() {
       localStorage.setItem('user', JSON.stringify(response.data.user));
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to login. Please check your credentials.');
+      if (!err.response) {
+        setError('Cannot connect to backend server. Please ensure Python backend is running on port 5000.');
+      } else {
+        setError(err.response?.data?.message || 'Failed to login. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }
@@ -65,6 +79,12 @@ export default function Login() {
           }}
         >
           <form onSubmit={handleSubmit} className="space-y-5">
+            {sessionExpiredMsg && (
+              <div className="flex items-center gap-2 text-amber-600 bg-amber-50 border border-amber-200 p-3 rounded-xl text-sm">
+                <Info size={16} className="shrink-0 text-amber-500" />
+                {sessionExpiredMsg}
+              </div>
+            )}
             {error && (
               <div className="flex items-center gap-2 text-red-400 p-3 rounded-xl text-sm"
                 style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)' }}

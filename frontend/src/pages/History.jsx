@@ -30,37 +30,37 @@ export default function History() {
   );
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Analysis History</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Review your past resume analyses and AI reports.</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Analysis History</h2>
+          <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-1">Review your past resume analyses and AI reports.</p>
         </div>
         
-        <div className="relative w-full md:w-72">
+        <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
           <input
             type="text"
             placeholder="Search filenames..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all"
+            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white text-sm transition-all"
           />
         </div>
       </div>
 
       <div className="glass rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left border-collapse min-w-[550px]">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
-                <th className="py-4 px-6 font-semibold text-sm text-slate-600 dark:text-slate-300">File Name</th>
-                <th className="py-4 px-6 font-semibold text-sm text-slate-600 dark:text-slate-300">Upload Date</th>
-                <th className="py-4 px-6 font-semibold text-sm text-slate-600 dark:text-slate-300">Status</th>
-                <th className="py-4 px-6 font-semibold text-sm text-slate-600 dark:text-slate-300 text-right">Actions</th>
+              <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 text-xs sm:text-sm">
+                <th className="py-3.5 px-4 sm:px-6 font-semibold text-slate-600 dark:text-slate-300">File Name</th>
+                <th className="py-3.5 px-4 sm:px-6 font-semibold text-slate-600 dark:text-slate-300">Upload Date</th>
+                <th className="py-3.5 px-4 sm:px-6 font-semibold text-slate-600 dark:text-slate-300">Status</th>
+                <th className="py-3.5 px-4 sm:px-6 font-semibold text-slate-600 dark:text-slate-300 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-700 text-xs sm:text-sm">
               {loading ? (
                 <tr>
                   <td colSpan="4" className="py-12 text-center text-slate-500">
@@ -89,31 +89,31 @@ export default function History() {
               ) : (
                 filteredHistory.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <td className="py-4 px-6">
+                    <td className="py-4 px-4 sm:px-6">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-brand-50 dark:bg-brand-900/30 rounded-lg text-brand-600 dark:text-brand-400">
-                          <FileText size={20} />
+                        <div className="p-2 bg-brand-50 dark:bg-brand-900/30 rounded-lg text-brand-600 dark:text-brand-400 shrink-0">
+                          <FileText size={18} />
                         </div>
-                        <span className="font-medium text-slate-900 dark:text-white truncate max-w-xs">{item.filename}</span>
+                        <span className="font-medium text-slate-900 dark:text-white truncate max-w-[150px] sm:max-w-xs">{item.filename}</span>
                       </div>
                     </td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
-                        <Clock size={16} />
+                    <td className="py-4 px-4 sm:px-6">
+                      <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                        <Clock size={15} />
                         {new Date(item.created_at).toLocaleDateString()}
                       </div>
                     </td>
-                    <td className="py-4 px-6">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
-                        {item.analysis_result?.status === 'pending_ml_analysis' ? 'Pending ML' : 'Processed'}
+                    <td className="py-4 px-4 sm:px-6">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+                        {item.analysis_result?.status === 'completed' ? 'Completed' : 'Processed'}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-right">
+                    <td className="py-4 px-4 sm:px-6 text-right">
                       <button 
                         onClick={() => setSelectedReport(item)}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/40 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/40 transition-colors"
                       >
-                        <Download size={16} />
+                        <Download size={15} />
                         Report
                       </button>
                     </td>
@@ -127,60 +127,94 @@ export default function History() {
 
       {/* Report Modal */}
       {selectedReport && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 dark:border-slate-800">
-            <div className="sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between z-10">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <FileText className="text-brand-500" size={24} />
-                Analysis Report: {selectedReport.filename}
+            <div className="sticky top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-4 sm:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between z-10">
+              <h3 className="text-base sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2 truncate pr-2">
+                <FileText className="text-brand-500 shrink-0" size={22} />
+                <span className="truncate">Report: {selectedReport.filename}</span>
               </h3>
               <button 
                 onClick={() => setSelectedReport(null)}
-                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
               >
-                <AlertCircle size={24} className="rotate-45" /> {/* Close Icon */}
+                <AlertCircle size={22} className="rotate-45" /> {/* Close Icon */}
               </button>
             </div>
             
-            <div className="p-6 space-y-6">
+            <div className="p-4 sm:p-6 space-y-6">
               {selectedReport.analysis_result?.status === 'completed' ? (
                 <>
-                  <div className="flex items-center gap-6 p-6 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
-                    <div className="relative w-24 h-24 flex items-center justify-center rounded-full bg-white dark:bg-slate-900 border-4 border-brand-500 shadow-sm">
-                      <span className="text-3xl font-bold text-brand-600 dark:text-brand-400">{selectedReport.analysis_result.ats_score}</span>
+                  {/* ATS Score Header */}
+                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 p-5 sm:p-6 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-center sm:text-left">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center rounded-full bg-white dark:bg-slate-900 border-4 border-brand-500 shadow-sm shrink-0">
+                      <span className="text-2xl sm:text-3xl font-bold text-brand-600 dark:text-brand-400">{selectedReport.analysis_result.ats_score}</span>
                     </div>
                     <div>
-                      <h4 className="text-lg font-semibold text-slate-900 dark:text-white">ATS Score</h4>
-                      <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Based on industry standards for Applicant Tracking Systems.</p>
+                      <h4 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white">ATS Compatibility Score</h4>
+                      <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">Calculated using industry ATS metrics (contact completeness, sections, keyword match, and quantifiable achievements).</p>
                     </div>
                   </div>
 
+                  {/* Category Score Breakdown */}
+                  {selectedReport.analysis_result.category_scores && (
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-slate-900 dark:text-white text-sm border-b border-slate-200 dark:border-slate-700 pb-2">Score Breakdown</h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                        <div className="p-2.5 rounded-lg bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800">
+                          <p className="text-[11px] text-slate-500">Contact Info</p>
+                          <p className="text-sm font-bold text-sky-700">{selectedReport.analysis_result.category_scores.contact} / 15</p>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800">
+                          <p className="text-[11px] text-slate-500">Sections</p>
+                          <p className="text-sm font-bold text-sky-700">{selectedReport.analysis_result.category_scores.sections} / 20</p>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800">
+                          <p className="text-[11px] text-slate-500">Skills & Keywords</p>
+                          <p className="text-sm font-bold text-sky-700">{selectedReport.analysis_result.category_scores.skills} / 25</p>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800">
+                          <p className="text-[11px] text-slate-500">Impact Metrics</p>
+                          <p className="text-sm font-bold text-sky-700">{selectedReport.analysis_result.category_scores.impact} / 20</p>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800">
+                          <p className="text-[11px] text-slate-500">Formatting</p>
+                          <p className="text-sm font-bold text-sky-700">{selectedReport.analysis_result.category_scores.formatting} / 20</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Contact Info & Detected Skills Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2">Contact Info</h4>
-                      <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-slate-900 dark:text-white text-sm border-b border-slate-200 dark:border-slate-700 pb-2">Contact Details</h4>
+                      <ul className="space-y-1.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
                         <li><strong>Email:</strong> {selectedReport.analysis_result.contact_info?.email || 'Not found'}</li>
                         <li><strong>Phone:</strong> {selectedReport.analysis_result.contact_info?.phone || 'Not found'}</li>
+                        {selectedReport.analysis_result.contact_info?.linkedin && <li><strong>LinkedIn:</strong> {selectedReport.analysis_result.contact_info.linkedin}</li>}
+                        {selectedReport.analysis_result.contact_info?.github && <li><strong>GitHub:</strong> {selectedReport.analysis_result.contact_info.github}</li>}
                       </ul>
                     </div>
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2">Detected Skills</h4>
-                      <div className="flex flex-wrap gap-2">
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-slate-900 dark:text-white text-sm border-b border-slate-200 dark:border-slate-700 pb-2">Detected Keywords ({selectedReport.analysis_result.skills?.length || 0})</h4>
+                      <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1">
                         {selectedReport.analysis_result.skills?.map(skill => (
-                          <span key={skill} className="px-2.5 py-1 text-xs font-medium bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300 rounded-lg">
+                          <span key={skill} className="px-2 py-0.5 text-xs font-medium bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300 rounded-lg">
                             {skill}
                           </span>
-                        )) || <span className="text-sm text-slate-500">No skills detected.</span>}
+                        )) || <span className="text-xs text-slate-500">No skills detected.</span>}
                       </div>
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2">AI Feedback</h4>
-                    <ul className="space-y-3">
+                  {/* AI Feedback */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-slate-900 dark:text-white text-sm border-b border-slate-200 dark:border-slate-700 pb-2">ATS Recommendations</h4>
+                    <ul className="space-y-2.5">
                       {selectedReport.analysis_result.feedback?.map((item, index) => (
-                        <li key={index} className="flex gap-3 text-sm text-slate-600 dark:text-slate-300">
-                          <AlertCircle size={18} className="text-amber-500 shrink-0 mt-0.5" />
+                        <li key={index} className="flex gap-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                          <AlertCircle size={16} className="text-amber-500 shrink-0 mt-0.5" />
                           <span>{item}</span>
                         </li>
                       ))}
@@ -190,15 +224,15 @@ export default function History() {
               ) : (
                 <div className="text-center py-12 text-slate-500">
                   <Clock size={48} className="mx-auto mb-4 text-slate-300 dark:text-slate-600" />
-                  <p>Analysis is still pending. Please check back later.</p>
+                  <p>Analysis is pending processing. Please check back shortly.</p>
                 </div>
               )}
             </div>
             
-            <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex justify-end">
+            <div className="p-4 sm:p-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex justify-end">
               <button 
                 onClick={() => setSelectedReport(null)}
-                className="px-6 py-2.5 bg-slate-900 dark:bg-slate-800 text-white rounded-xl font-medium hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors"
+                className="w-full sm:w-auto px-6 py-2.5 bg-slate-900 dark:bg-slate-800 text-white rounded-xl text-sm font-medium hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors"
               >
                 Close Report
               </button>
