@@ -69,7 +69,7 @@ export default function Login() {
         if (err.response.status === 404) {
           setError('No account exists with this email address. Please register first.');
         } else if (err.response.status === 401) {
-          setError('Incorrect password. Please try again or click "Forgot password?".');
+          setError('Incorrect password. Please try again.');
         } else {
           setError(err.response?.data?.message || 'Failed to login. Please check your credentials.');
         }
@@ -158,12 +158,7 @@ export default function Login() {
             </div>
 
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Password</label>
-                <Link to="/forgot-password" className="text-xs font-semibold text-sky-600 hover:text-sky-700 transition-colors">
-                  Forgot password?
-                </Link>
-              </div>
+              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600" size={18} />
                 <input
