@@ -50,7 +50,8 @@ If you didn't request a password reset, ignore this email.
 
 — The ResumeAI Team
 """
-    msg = Message(subject=subject, recipients=[to_email], body=body)
+    sender = current_app.config.get("MAIL_DEFAULT_SENDER") or current_app.config.get("MAIL_USERNAME")
+    msg = Message(subject=subject, recipients=[to_email], body=body, sender=sender)
     mail.send(msg)
 
 
@@ -109,9 +110,11 @@ def send_register_otp():
     try:
         _send_otp_email(email, otp, "register")
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         current_app.logger.error(f"Mail send error: {e}")
         return jsonify({
-            "message": "Failed to send verification email. Check that your MAIL_USERNAME and MAIL_PASSWORD are set in the backend .env file."
+            "message": f"Failed to send verification code: {str(e)}"
         }), 500
 
     return jsonify({"message": f"Verification code sent to {email}. It expires in 10 minutes."}), 200
@@ -204,9 +207,11 @@ def send_reset_otp():
     try:
         _send_otp_email(email, otp, "reset")
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         current_app.logger.error(f"Mail send error: {e}")
         return jsonify({
-            "message": "Failed to send reset email. Check that your MAIL_USERNAME and MAIL_PASSWORD are set in the backend .env file."
+            "message": f"Failed to send reset code: {str(e)}"
         }), 500
 
     return jsonify({"message": f"Password reset code sent to {email}. It expires in 10 minutes."}), 200
