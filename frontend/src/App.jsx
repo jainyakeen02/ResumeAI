@@ -8,6 +8,9 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+
 const ProtectedRoute = () => {
   const isAuthenticated = !!localStorage.getItem('token');
   return isAuthenticated ? <DashboardLayout /> : <Navigate to="/login" replace />;
@@ -22,6 +25,8 @@ function App() {
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Dashboard Routes (Protected) */}
         <Route element={<ProtectedRoute />}>

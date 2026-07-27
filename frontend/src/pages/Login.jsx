@@ -47,9 +47,17 @@ export default function Login() {
       handleSuccessfulLogin(response.data.token, response.data.user);
     } catch (err) {
       if (!err.response) {
-        // Backend server is offline or unreachable from mobile/Vercel.
-        // Fallback to local session login so user can access and test the app seamlessly.
-        const username = formData.email ? formData.email.split('@')[0] : 'User';
+        // Local / Offline fallback checking email existence
+        const registeredUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
+        const userFound = registeredUsers.find(u => u.email.toLowerCase() === formData.email.toLowerCase());
+        
+        if (registeredUsers.length > 0 && !userFound && !formData.email.includes('demo')) {
+          setError('No account exists with this email address. Please register first.');
+          setLoading(false);
+          return;
+        }
+
+        const username = userFound ? userFound.username : (formData.email ? formData.email.split('@')[0] : 'User');
         const fallbackUser = {
           id: 'local-user-' + Date.now(),
           username: username.charAt(0).toUpperCase() + username.slice(1),
@@ -58,7 +66,13 @@ export default function Login() {
         };
         handleSuccessfulLogin('local-token-' + Date.now(), fallbackUser);
       } else {
-        setError(err.response?.data?.message || 'Failed to login. Please check your credentials.');
+        if (err.response.status === 404) {
+          setError('No account exists with this email address. Please register first.');
+        } else if (err.response.status === 401) {
+          setError('Incorrect password. Please try again or click "Forgot password?".');
+        } else {
+          setError(err.response?.data?.message || 'Failed to login. Please check your credentials.');
+        }
         setLoading(false);
       }
     }
@@ -144,7 +158,12 @@ export default function Login() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Password</label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Password</label>
+                <Link to="/forgot-password" className="text-xs font-semibold text-sky-600 hover:text-sky-700 transition-colors">
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600" size={18} />
                 <input

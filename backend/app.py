@@ -2,7 +2,7 @@ import os
 from flask import Flask
 from flask_cors import CORS
 
-from extensions import db
+from extensions import db, mail
 from config import Config
 from routes import register_routes
 
@@ -14,6 +14,7 @@ def create_app(config_class=Config):
     # Initialize Extensions
     CORS(app)
     db.init_app(app)
+    mail.init_app(app)
 
     # Ensure upload folder exists
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
