@@ -68,7 +68,7 @@ def get_stats(current_user):
     pending = total - analyzed
     
     scores = [r.analysis_result.get('ats_score', 0) for r in all_resumes if r.analysis_result and r.analysis_result.get('ats_score')]
-    avg_score = round(sum(scores) / len(scores)) if scores else 85
+    avg_score = round(sum(scores) / len(scores)) if scores else 0
     
     return jsonify({
         "total_uploads": total,
