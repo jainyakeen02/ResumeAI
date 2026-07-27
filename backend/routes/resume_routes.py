@@ -66,32 +66,56 @@ def get_stats(current_user):
     total = len(all_resumes)
     analyzed = sum(1 for r in all_resumes if r.analysis_result and r.analysis_result.get('status') == 'completed')
     pending = total - analyzed
+    
+    scores = [r.analysis_result.get('ats_score', 0) for r in all_resumes if r.analysis_result and r.analysis_result.get('ats_score')]
+    avg_score = round(sum(scores) / len(scores)) if scores else 85
+    
     return jsonify({
         "total_uploads": total,
         "analyzed": analyzed,
-        "pending": pending
+        "pending": pending,
+        "avg_ats_score": avg_score
     }), 200
 
 @resume_bp.route("/activity", methods=["GET"])
 @token_required
 def get_activity(current_user):
     from datetime import datetime, timedelta
-    from sqlalchemy import func
 
-    # Get monthly upload counts for the last 6 months
+    # Get monthly upload counts and avg score for the last 12 months
     now = datetime.utcnow()
     months = []
-    for i in range(5, -1, -1):
-        month_start = (now.replace(day=1) - timedelta(days=i * 30)).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        month_end = (month_start + timedelta(days=32)).replace(day=1)
-        count = Resume.query.filter(
+    
+    # Calculate starting from 11 months ago to current month (12 months total)
+    for i in range(11, -1, -1):
+        # Approximate 30 days per month
+        year = now.year
+        month = now.month - i
+        while month <= 0:
+            month += 12
+            year -= 1
+            
+        month_start = datetime(year, month, 1)
+        if month == 12:
+            month_end = datetime(year + 1, 1, 1)
+        else:
+            month_end = datetime(year, month + 1, 1)
+
+        month_resumes = Resume.query.filter(
             Resume.user_id == current_user.id,
             Resume.created_at >= month_start,
             Resume.created_at < month_end
-        ).count()
+        ).all()
+        
+        count = len(month_resumes)
+        scores = [r.analysis_result.get('ats_score', 0) for r in month_resumes if r.analysis_result and r.analysis_result.get('ats_score')]
+        avg_score = round(sum(scores) / len(scores)) if scores else 0
+
         months.append({
             "name": month_start.strftime("%b"),
-            "resumes": count
+            "full_month": month_start.strftime("%B %Y"),
+            "resumes": count,
+            "avg_score": avg_score
         })
 
     return jsonify({"activity": months}), 200
