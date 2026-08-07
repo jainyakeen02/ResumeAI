@@ -1,218 +1,276 @@
 import { useState, useCallback } from 'react';
-import { UploadCloud, File as FileIcon, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import {
+  UploadCloud, File as FileIcon, X, CheckCircle, AlertCircle,
+  Target, MessageSquare, Zap, Star, TrendingUp, Award
+} from 'lucide-react';
 import api from '../utils/api';
 
 export default function Upload() {
+  const navigate = useNavigate();
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState(null);
-  const [uploadStatus, setUploadStatus] = useState('idle'); // idle, uploading, success, error
+  const [uploadStatus, setUploadStatus] = useState('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [analysisResult, setAnalysisResult] = useState(null);
+  const [resumeId, setResumeId] = useState(null);
 
   const handleDrag = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
+    e.preventDefault(); e.stopPropagation();
+    setDragActive(e.type === 'dragenter' || e.type === 'dragover');
   }, []);
 
   const handleDrop = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); e.stopPropagation();
     setDragActive(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile.type === 'application/pdf') {
-        setFile(droppedFile);
-        setUploadStatus('idle');
-      } else {
-        setUploadStatus('error');
-        setErrorMessage('Please upload a PDF file.');
-      }
-    }
+    const f = e.dataTransfer.files?.[0];
+    if (f?.type === 'application/pdf') { setFile(f); setUploadStatus('idle'); }
+    else { setUploadStatus('error'); setErrorMessage('Only PDF files are allowed.'); }
   }, []);
 
   const handleChange = (e) => {
-    e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      if (selectedFile.type === 'application/pdf') {
-        setFile(selectedFile);
-        setUploadStatus('idle');
-      } else {
-        setUploadStatus('error');
-        setErrorMessage('Please upload a PDF file.');
-      }
-    }
+    const f = e.target.files?.[0];
+    if (f?.type === 'application/pdf') { setFile(f); setUploadStatus('idle'); setErrorMessage(''); }
+    else { setUploadStatus('error'); setErrorMessage('Only PDF files are allowed.'); }
   };
 
   const handleUpload = async () => {
     if (!file) return;
-
     setUploadStatus('uploading');
     const formData = new FormData();
     formData.append('resume', file);
 
     try {
       const response = await api.post('/resume/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-      
-      console.log('Upload successful:', response.data);
+      const data = response.data.resume;
+      setAnalysisResult(data.analysis_result);
+      setResumeId(data.id);
       setUploadStatus('success');
-      
     } catch (error) {
-      console.error('Upload failed:', error);
       if (!error.response) {
-        // Offline / Mobile preview fallback simulation
-        const demoAnalysis = {
-          id: 'resume-' + Date.now(),
-          filename: file.name,
-          created_at: new Date().toISOString(),
-          analysis_result: {
-            status: 'completed',
-            ats_score: Math.floor(Math.random() * 15) + 80, // 80-95
-            contact_info: { email: 'user@example.com', phone: '+1 (555) 019-2834', linkedin: 'linkedin.com/in/user' },
-            skills: ['Python', 'JavaScript', 'React', 'Tailwind CSS', 'Git', 'SQL', 'Problem Solving'],
-            category_scores: { contact: 14, sections: 19, skills: 23, impact: 17, formatting: 18 },
-            feedback: [
-              'Add quantifiable metric outcomes to your experience section bullet points.',
-              'Job title alignment matches high-priority keyword filters.',
-              'Contact details and main section headings are formatted cleanly.'
-            ]
-          }
+        // Offline fallback
+        const demo = {
+          status: 'completed', ats_score: 82,
+          contact_info: { email: 'user@example.com', phone: '+1 555-234-5678', linkedin: null },
+          skills: ['Python', 'JavaScript', 'React', 'SQL', 'Git', 'REST APIs'],
+          category_scores: { contact: 12, sections: 18, skills: 22, impact: 16, formatting: 14 },
+          feedback: ['Add quantifiable metrics to experience bullets.', 'Strong technical keyword coverage detected.'],
         };
-        const existingHistory = JSON.parse(localStorage.getItem('local_history') || '[]');
-        localStorage.setItem('local_history', JSON.stringify([demoAnalysis, ...existingHistory]));
+        setAnalysisResult(demo);
         setUploadStatus('success');
       } else {
         setUploadStatus('error');
-        setErrorMessage(error.response?.data?.message || 'Failed to upload resume. Please try again.');
+        setErrorMessage(error.response?.data?.message || 'Upload failed. Please try again.');
       }
     }
   };
 
-  const resetUpload = () => {
-    setFile(null);
-    setUploadStatus('idle');
-    setErrorMessage('');
-  };
+  const reset = () => { setFile(null); setUploadStatus('idle'); setErrorMessage(''); setAnalysisResult(null); setResumeId(null); };
+
+  const score = analysisResult?.ats_score || 0;
+  const scoreColor = score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444';
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
+    <div className="max-w-5xl mx-auto space-y-6 pb-10 animate-slideUp">
+      {/* Header */}
       <div>
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Upload Resume</h2>
-        <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-1">Upload your PDF resume for AI-powered analysis.</p>
+        <h2 className="text-2xl font-bold text-slate-900">Upload & Analyze Resume</h2>
+        <p className="text-slate-500 mt-1 text-sm">Drop your PDF resume below — our AI will analyze it instantly.</p>
       </div>
 
-      <div className="glass rounded-2xl p-5 sm:p-8">
-        {!file ? (
-          <div 
-            className={`relative border-2 border-dashed rounded-2xl p-6 sm:p-12 transition-all duration-200 ease-in-out flex flex-col items-center justify-center text-center cursor-pointer
-              ${dragActive ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20 scale-[1.02]' : 'border-slate-300 dark:border-slate-700 hover:border-brand-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'}
-            `}
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-          >
-            <input 
-              type="file" 
-              accept=".pdf" 
-              onChange={handleChange} 
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            />
-            <div className="bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-full shadow-sm mb-3 sm:mb-4">
-              <UploadCloud size={28} className="text-brand-500 sm:w-8 sm:h-8" />
-            </div>
-            <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white mb-2">
-              Drag & Drop your resume here
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-6">
-              or click to browse from your computer (PDF only, max 10MB)
-            </p>
-            <button className="bg-slate-900 dark:bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-transform hover:scale-105 pointer-events-none">
-              Select File
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/50">
-              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                <div className="bg-brand-100 dark:bg-brand-900/30 p-2.5 sm:p-3 rounded-lg text-brand-600 dark:text-brand-400 shrink-0">
-                  <FileIcon size={22} />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-semibold text-slate-900 dark:text-white truncate max-w-[180px] sm:max-w-xs text-sm sm:text-base">{file.name}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
-                </div>
+      {/* Upload Zone */}
+      {uploadStatus !== 'success' && (
+        <div className="card p-6 sm:p-8">
+          {!file ? (
+            <div
+              className={`relative border-2 border-dashed rounded-2xl p-10 transition-all duration-200 flex flex-col items-center justify-center text-center cursor-pointer
+                ${dragActive
+                  ? 'border-sky-400 bg-sky-50 scale-[1.01]'
+                  : 'border-slate-200 hover:border-sky-300 hover:bg-slate-50'
+                }`}
+              onDragEnter={handleDrag} onDragLeave={handleDrag}
+              onDragOver={handleDrag} onDrop={handleDrop}
+            >
+              <input type="file" accept=".pdf" onChange={handleChange}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-sky-100 to-indigo-100 flex items-center justify-center mb-5 animate-float">
+                <UploadCloud size={36} className="text-sky-600" />
               </div>
-              {uploadStatus === 'idle' && (
-                <button onClick={resetUpload} className="p-2 text-slate-400 hover:text-red-500 transition-colors shrink-0">
-                  <X size={20} />
-                </button>
+              <h3 className="text-lg font-bold text-slate-800 mb-2">Drag & Drop your resume here</h3>
+              <p className="text-sm text-slate-500 mb-6">or click anywhere to browse — PDF only, max 10MB</p>
+              <div className="btn-primary text-sm px-6 py-2.5 pointer-events-none">Select PDF File</div>
+            </div>
+          ) : (
+            <div className="space-y-5">
+              {/* File Preview */}
+              <div className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-sky-50 to-indigo-50 border border-sky-100">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0">
+                    <FileIcon size={22} className="text-sky-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-slate-900 truncate max-w-[200px] sm:max-w-xs">{file.name}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{(file.size / 1024 / 1024).toFixed(2)} MB · PDF Document</p>
+                  </div>
+                </div>
+                {uploadStatus === 'idle' && (
+                  <button onClick={reset} className="p-2 text-slate-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50">
+                    <X size={18} />
+                  </button>
+                )}
+              </div>
+
+              {uploadStatus === 'error' && (
+                <div className="flex items-center gap-2.5 text-red-600 bg-red-50 p-4 rounded-xl text-sm border border-red-100">
+                  <AlertCircle size={18} className="shrink-0" /> {errorMessage}
+                </div>
               )}
-            </div>
 
-            {uploadStatus === 'error' && (
-              <div className="flex items-center gap-2 text-red-500 bg-red-50 dark:bg-red-500/10 p-4 rounded-xl text-sm">
-                <AlertCircle size={16} />
-                {errorMessage}
-              </div>
-            )}
-
-            {uploadStatus === 'success' && (
-              <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 p-4 rounded-xl text-sm border border-emerald-200 dark:border-emerald-500/20">
-                <CheckCircle size={16} />
-                Resume uploaded successfully! Text extracted & analyzed.
-              </div>
-            )}
-
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <button 
-                onClick={resetUpload}
-                disabled={uploadStatus === 'uploading'}
-                className="flex-1 py-3 px-4 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 text-sm"
-              >
-                {uploadStatus === 'success' ? 'Upload Another' : 'Cancel'}
-              </button>
-              
-              {uploadStatus !== 'success' && (
-                <button 
-                  onClick={handleUpload}
-                  disabled={uploadStatus === 'uploading'}
-                  className="flex-1 py-3 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-medium shadow-lg shadow-brand-500/30 transition-all disabled:opacity-70 flex justify-center items-center gap-2 text-sm"
-                >
+              <div className="flex gap-3">
+                <button onClick={reset} disabled={uploadStatus === 'uploading'}
+                  className="flex-1 py-3 border-2 border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-colors text-sm disabled:opacity-50">
+                  Cancel
+                </button>
+                <button onClick={handleUpload} disabled={uploadStatus === 'uploading'}
+                  className="flex-1 btn-primary text-sm flex items-center justify-center gap-2 disabled:opacity-70">
                   {uploadStatus === 'uploading' ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Uploading...
-                    </>
+                    <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Analyzing...</>
                   ) : (
-                    'Analyze Resume'
+                    <><Zap size={16} /> Analyze Resume</>
                   )}
                 </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ───── Analysis Results ───── */}
+      {uploadStatus === 'success' && analysisResult && (
+        <div className="space-y-5 animate-fadeIn">
+          {/* Success Banner */}
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700">
+            <CheckCircle size={20} className="shrink-0" />
+            <div>
+              <p className="font-semibold">Resume analyzed successfully!</p>
+              <p className="text-xs mt-0.5 text-emerald-600">AI-powered ATS analysis complete. See your full results below.</p>
+            </div>
+            <button onClick={reset} className="ml-auto text-xs font-bold text-emerald-600 hover:underline shrink-0">Upload Another</button>
+          </div>
+
+          {/* Main Results Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            {/* ATS Score Card */}
+            <div className="card p-6 flex flex-col items-center text-center">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">ATS Compatibility Score</p>
+              <div
+                className="relative w-32 h-32 rounded-full flex items-center justify-center score-ring mb-4"
+                style={{ border: `6px solid ${scoreColor}`, boxShadow: `0 0 0 0 ${scoreColor}40` }}
+              >
+                <div>
+                  <span className="text-4xl font-black" style={{ color: scoreColor }}>{score}</span>
+                  <span className="text-lg font-bold text-slate-400">/100</span>
+                </div>
+              </div>
+              <p className="text-sm font-semibold text-slate-700">
+                {score >= 80 ? '🟢 Excellent' : score >= 60 ? '🟡 Good' : '🔴 Needs Work'}
+              </p>
+              {analysisResult.ats_score_explanation && (
+                <p className="text-xs text-slate-500 mt-3 leading-relaxed">{analysisResult.ats_score_explanation}</p>
+              )}
+            </div>
+
+            {/* Category Breakdown */}
+            {analysisResult.category_scores && (
+              <div className="card p-6">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Score Breakdown</p>
+                <div className="space-y-3">
+                  {[
+                    { label: 'Contact Info', val: analysisResult.category_scores.contact, max: 15 },
+                    { label: 'Sections', val: analysisResult.category_scores.sections, max: 20 },
+                    { label: 'Keywords & Skills', val: analysisResult.category_scores.skills, max: 25 },
+                    { label: 'Impact Metrics', val: analysisResult.category_scores.impact, max: 35 },
+                    { label: 'Formatting', val: analysisResult.category_scores.formatting, max: 20 },
+                  ].map(({ label, val, max }) => {
+                    const pct = Math.round(((val || 0) / max) * 100);
+                    const col = pct >= 75 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444';
+                    return (
+                      <div key={label}>
+                        <div className="flex justify-between text-xs font-medium text-slate-600 mb-1">
+                          <span>{label}</span>
+                          <span style={{ color: col }}>{val ?? 0}/{max}</span>
+                        </div>
+                        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-700"
+                            style={{ width: `${pct}%`, background: col }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Contact + Quick Actions */}
+            <div className="space-y-5">
+              {analysisResult.contact_info && (
+                <div className="card p-5">
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Contact Detected</p>
+                  <ul className="space-y-1.5 text-xs text-slate-600">
+                    <li><span className="font-semibold">Email:</span> {analysisResult.contact_info.email || '—'}</li>
+                    <li><span className="font-semibold">Phone:</span> {analysisResult.contact_info.phone || '—'}</li>
+                    {analysisResult.contact_info.linkedin && <li><span className="font-semibold">LinkedIn:</span> {analysisResult.contact_info.linkedin}</li>}
+                    {analysisResult.contact_info.github && <li><span className="font-semibold">GitHub:</span> {analysisResult.contact_info.github}</li>}
+                  </ul>
+                </div>
+              )}
+              {resumeId && (
+                <div className="card p-5 space-y-2.5">
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">AI Features</p>
+                  <button onClick={() => navigate(`/gap-analysis/${resumeId}`)}
+                    className="w-full flex items-center gap-2.5 p-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold text-sm transition-colors">
+                    <Target size={16} /> Skill Gap Analysis
+                  </button>
+                  <button onClick={() => navigate(`/mock-interview/${resumeId}`)}
+                    className="w-full flex items-center gap-2.5 p-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold text-sm transition-colors">
+                    <MessageSquare size={16} /> Mock Interview
+                  </button>
+                </div>
               )}
             </div>
           </div>
-        )}
-      </div>
-      
-      {uploadStatus === 'success' && (
-         <div className="glass rounded-2xl p-6 border-l-4 border-l-emerald-500">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-              <CheckCircle className="text-emerald-500" size={20} />
-              Analysis Complete
-            </h3>
-            <p className="text-slate-600 dark:text-slate-400">
-              The AI/ML scoring algorithm has analyzed your resume. You can view the detailed report in your <strong>History</strong>.
-            </p>
-         </div>
+
+          {/* Skills */}
+          {analysisResult.skills?.length > 0 && (
+            <div className="card p-6">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Detected Skills & Keywords ({analysisResult.skills.length})</p>
+              <div className="flex flex-wrap gap-2">
+                {analysisResult.skills.map((s) => (
+                  <span key={s} className="px-3 py-1 text-xs font-semibold rounded-xl bg-gradient-to-r from-sky-50 to-indigo-50 text-sky-700 border border-sky-100">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* AI Feedback */}
+          {analysisResult.feedback?.length > 0 && (
+            <div className="card p-6">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">AI Recommendations</p>
+              <ul className="space-y-2.5">
+                {analysisResult.feedback.map((item, i) => (
+                  <li key={i} className="flex gap-3 p-3.5 rounded-xl bg-amber-50 border border-amber-100 text-sm text-slate-700">
+                    <AlertCircle size={16} className="text-amber-500 shrink-0 mt-0.5" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

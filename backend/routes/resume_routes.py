@@ -6,6 +6,7 @@ from utils.pdf_extractor import extract_text_from_pdf
 from models.resume import Resume
 from extensions import db
 from nlp.analyzer import analyze_resume
+from services.llm_service import analyze_skill_gap
 
 resume_bp = Blueprint("resume", __name__)
 
@@ -119,3 +120,34 @@ def get_activity(current_user):
         })
 
     return jsonify({"activity": months}), 200
+
+@resume_bp.route("/<int:resume_id>/gap-analysis", methods=["POST"])
+@token_required
+def gap_analysis(current_user, resume_id):
+    data = request.get_json()
+    if not data or 'job_description' not in data:
+        return jsonify({"message": "Job description is required."}), 400
+        
+    job_description = data['job_description']
+    
+    # Fetch resume ensuring it belongs to the current user
+    resume = Resume.query.filter_by(id=resume_id, user_id=current_user.id).first()
+    
+    if not resume:
+        return jsonify({"message": "Resume not found."}), 404
+        
+    if not resume.extracted_text:
+        return jsonify({"message": "Resume text is not available for analysis."}), 400
+        
+    result = analyze_skill_gap(resume.extracted_text, job_description)
+    
+    if not result:
+        return jsonify({"message": "Skill Gap Analysis failed."}), 500
+        
+    if "error" in result:
+        return jsonify({"message": f"API Error: {result['error']}"}), 500
+        
+    return jsonify({
+        "message": "Skill Gap Analysis completed successfully.",
+        "analysis": result
+    }), 200

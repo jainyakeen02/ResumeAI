@@ -1,4 +1,5 @@
 import re
+from services.llm_service import generate_resume_analysis
 
 # Comprehensive list of skills categorized for robust matching
 SKILLS_DB = [
@@ -52,7 +53,7 @@ ACTION_VERBS = [
     "orchestrated", "scaled", "pioneered", "refactored", "migrated", "maximized"
 ]
 
-def analyze_resume(text):
+def analyze_resume_legacy(text):
     if not text:
         return {
             "status": "error",
@@ -223,4 +224,67 @@ def analyze_resume(text):
         "word_count": word_count,
         "feedback": feedback
     }
+
+def analyze_resume(text):
+    if not text:
+        return {
+            "status": "error",
+            "message": "No text provided to analyze."
+        }
+        
+    text_lower = text.lower()
+    
+    # 1. Contact & Social Profiles Detection (Always Regex, LLMs hallucinate these)
+    email_pattern = r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
+    phone_pattern = r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
+    linkedin_pattern = r'linkedin\.com/in/[a-zA-Z0-9_-]+'
+    github_pattern = r'github\.com/[a-zA-Z0-9_-]+'
+
+    emails = re.findall(email_pattern, text)
+    phones = re.findall(phone_pattern, text)
+    linkedins = re.findall(linkedin_pattern, text_lower)
+    githubs = re.findall(github_pattern, text_lower)
+    
+    contact_info = {
+        "email": emails[0] if emails else None,
+        "phone": phones[0] if phones else None,
+        "linkedin": linkedins[0] if linkedins else None,
+        "github": githubs[0] if githubs else None
+    }
+    
+    # Calculate contact score
+    contact_score = 0
+    if contact_info["email"]: contact_score += 5
+    if contact_info["phone"]: contact_score += 5
+    if contact_info["linkedin"] or contact_info["github"]: contact_score += 5
+    
+    # 2. Try LLM Analysis (Deep Understanding)
+    llm_result = generate_resume_analysis(text)
+    
+    if llm_result:
+        # LLM Succeeded! Merge contact info and return
+        # Ensure category_scores includes contact
+        llm_category_scores = llm_result.get("category_scores", {})
+        llm_category_scores["contact"] = contact_score
+        
+        # Recalculate ATS score slightly to include contact score if needed,
+        # but trust the LLM's primary judgement for the base score.
+        final_ats_score = min(llm_result.get("ats_score", 0) + contact_score, 100)
+        
+        return {
+            "status": "completed",
+            "contact_info": contact_info,
+            "skills": llm_result.get("skills", []),
+            "ats_score": final_ats_score,
+            "category_scores": llm_category_scores,
+            "metrics_found_count": 0, # LLM abstracts this
+            "action_verbs_count": len(llm_result.get("action_verbs_found", [])),
+            "word_count": len(text.split()),
+            "feedback": llm_result.get("feedback", []),
+            "ats_score_explanation": llm_result.get("ats_score_explanation", "")
+        }
+    else:
+        # 3. Fallback to Legacy Rule-Based Analysis if LLM fails (e.g. missing API key)
+        print("Falling back to legacy Regex-based analysis.")
+        return analyze_resume_legacy(text)
 

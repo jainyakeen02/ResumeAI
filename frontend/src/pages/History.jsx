@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { FileText, Download, Clock, AlertCircle, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { FileText, Download, Clock, AlertCircle, Search, Target, MessageSquare } from 'lucide-react';
 import api from '../utils/api';
 
 export default function History() {
+  const navigate = useNavigate();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -252,7 +254,19 @@ export default function History() {
               )}
             </div>
             
-            <div className="p-4 sm:p-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex justify-end">
+            <div className="p-4 sm:p-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex flex-wrap gap-3 justify-end">
+              <button 
+                onClick={() => navigate(`/gap-analysis/${selectedReport.id}`)}
+                className="w-full sm:w-auto px-6 py-2.5 bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400 rounded-xl text-sm font-medium hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors flex items-center justify-center gap-2"
+              >
+                <Target size={16} /> Skill Gap Analysis
+              </button>
+              <button 
+                onClick={() => navigate(`/mock-interview/${selectedReport.id}`)}
+                className="w-full sm:w-auto px-6 py-2.5 bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 rounded-xl text-sm font-medium hover:bg-sky-100 dark:hover:bg-sky-900/50 transition-colors flex items-center justify-center gap-2"
+              >
+                <MessageSquare size={16} /> Mock Interview
+              </button>
               <button 
                 onClick={() => setSelectedReport(null)}
                 className="w-full sm:w-auto px-6 py-2.5 bg-slate-900 dark:bg-slate-800 text-white rounded-xl text-sm font-medium hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors"

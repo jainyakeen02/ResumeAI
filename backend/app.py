@@ -22,10 +22,15 @@ def create_app(config_class=Config):
     # Register Routes
     register_routes(app)
 
+    @app.route("/")
+    def index():
+        return {"status": "success", "message": "ResumeAI 2.0 Backend is running smoothly!"}
+
     # Create Database Tables
     with app.app_context():
         import models.user
         import models.resume
+        import models.interview
 
         db.create_all()
 

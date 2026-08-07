@@ -7,6 +7,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
+import SkillGap from './pages/SkillGap';
+import MockInterview from './pages/MockInterview';
 
 const ProtectedRoute = () => {
   const isAuthenticated = !!localStorage.getItem('token');
@@ -30,6 +32,8 @@ function App() {
           <Route path="/history" element={<History />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/gap-analysis/:id" element={<SkillGap />} />
+          <Route path="/mock-interview/:id" element={<MockInterview />} />
         </Route>
       </Routes>
     </Router>

@@ -7,16 +7,11 @@ export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-sky-50">
+    <div className="flex h-screen overflow-hidden" style={{ background: '#f8faff' }}>
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Navbar onToggleSidebar={() => setSidebarOpen((prev) => !prev)} />
-        <main
-          className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8"
-          style={{
-            background: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(56,189,248,0.22) 0%, transparent 60%)',
-          }}
-        >
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <Outlet />
         </main>
       </div>
