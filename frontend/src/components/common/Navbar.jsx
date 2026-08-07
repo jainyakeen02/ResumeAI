@@ -8,7 +8,7 @@ function Navbar() {
           to="/"
           className="text-2xl font-bold text-blue-600"
         >
-          ResumeAI
+          AI Resume Assistant
         </Link>
 
         <div className="flex gap-6">

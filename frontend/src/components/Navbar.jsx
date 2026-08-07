@@ -59,7 +59,7 @@ export default function Navbar({ onToggleSidebar }) {
         {/* Page Title */}
         <div className="hidden sm:flex flex-col">
           <h1 className="text-base font-bold text-slate-800 leading-tight">{pageTitle}</h1>
-          <p className="text-[10px] text-slate-400 font-medium leading-tight">ResumeAI 2.0</p>
+          <p className="text-[10px] text-slate-400 font-medium leading-tight">AI Resume Assistant</p>
         </div>
       </div>
 

@@ -52,8 +52,8 @@ export default function Sidebar({ isOpen, onClose }) {
               <Zap size={18} className="text-white" />
             </div>
             <div>
-              <span className="text-base font-bold tracking-tight" style={{ background: 'linear-gradient(135deg,#0284c7,#6366f1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>ResumeAI</span>
-              <span className="block text-[10px] font-semibold text-slate-400 -mt-0.5 tracking-wider">2.0</span>
+              <span className="text-base font-bold tracking-tight" style={{ background: 'linear-gradient(135deg,#0284c7,#6366f1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>AI Resume Assistant</span>
+              <span className="block text-[10px] font-semibold text-slate-400 -mt-0.5 tracking-wider"></span>
             </div>
           </div>
           <button
